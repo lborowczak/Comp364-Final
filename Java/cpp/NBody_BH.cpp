@@ -47,8 +47,12 @@ using namespace std;
                bh->updateForce(bodies[i]);
                bodies[i]->update(dt);
             }
+        delete oct;
+        delete bh;
         }
-
+        for (int i = 0; i < nparts; i++){
+            delete bodies[i];
+        }
         auto t2 = chrono::system_clock::now();
         chrono::duration<double> t_elapsed = t2 - t1;
 

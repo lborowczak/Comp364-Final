@@ -37,14 +37,30 @@ void BHTree::insert(Body* b) {
     // external node
     else {
         // subdivide the region further by creating four children
-        TNW = new BHTree(oct.TNW());
-        BNW = new BHTree(oct.BNW());
-        TNE = new BHTree(oct.TNE());
-        BNE = new BHTree(oct.BNE());
-        TSE = new BHTree(oct.TSE());
-        BSE = new BHTree(oct.BSE());
-        TSW = new BHTree(oct.TSW());
-        BSW = new BHTree(oct.BSW());
+        Oct* tmpTNW = oct.TNW();
+        Oct* tmpBNW = oct.BNW();
+        Oct* tmpTNE = oct.TNE();
+        Oct* tmpBNE = oct.BNE();
+        Oct* tmpTSE = oct.TSE();
+        Oct* tmpBSE = oct.BSE();
+        Oct* tmpTSW = oct.TSW();
+        Oct* tmpBSW = oct.BSW();
+        TNW = new BHTree(tmpTNW);
+        BNW = new BHTree(tmpBNW);
+        TNE = new BHTree(tmpTNE);
+        BNE = new BHTree(tmpBNE);
+        TSE = new BHTree(tmpTSE);
+        BSE = new BHTree(tmpBSE);
+        TSW = new BHTree(tmpTSW);
+        BSW = new BHTree(tmpBSW);
+        delete tmpTNW;
+        delete tmpBNW;
+        delete tmpTNE;
+        delete tmpBNE;
+        delete tmpTSE;
+        delete tmpBSE;
+        delete tmpTSW;
+        delete tmpBSW;
 
 
         // recursively insert both this body and Body b into the appropriate octant
@@ -58,22 +74,48 @@ void BHTree::insert(Body* b) {
 
 // Inserts a body into the appropriate octant.
 void BHTree::putBody(Body* b) {
-    if (b->in(oct.TNW()))
+
+    Oct* tmpTNW = oct.TNW();
+    Oct* tmpBNW = oct.BNW();
+    Oct* tmpTNE = oct.TNE();
+    Oct* tmpBNE = oct.BNE();
+    Oct* tmpTSE = oct.TSE();
+    Oct* tmpBSE = oct.BSE();
+    Oct* tmpTSW = oct.TSW();
+    Oct* tmpBSW = oct.BSW();
+
+    if (b->in(tmpTNW))
         TNW->insert(b);
-    else if (b->in(oct.BNW()))
+
+    else if (b->in(tmpBNW))
         BNW->insert(b);
-    else if (b->in(oct.TNE()))
+
+    else if (b->in(tmpTNE))
         TNE->insert(b);
-    else if (b->in(oct.BNE()))
+
+    else if (b->in(tmpBNE))
         BNE->insert(b);
-    else if (b->in(oct.TSE()))
+
+    else if (b->in(tmpTSE))
         TSE->insert(b);
-    else if (b->in(oct.BSE()))
+
+    else if (b->in(tmpBSE))
         BSE->insert(b);
-    else if (b->in(oct.TSW()))
+
+    else if (b->in(tmpTSW))
         TSW->insert(b);
-    else if (b->in(oct.BSW()))
+
+    else if (b->in(tmpBSW))
         BSW->insert(b);
+
+    delete tmpTNW;
+    delete tmpBNW;
+    delete tmpTNE;
+    delete tmpBNE;
+    delete tmpTSE;
+    delete tmpBSE;
+    delete tmpTSW;
+    delete tmpBSW;
 }
 
 
@@ -132,3 +174,13 @@ public String toString() {
         return "*" + body + "\n" + TNW + BNW + TNE + BNE + TSW + BSW + TSE + BSE;
 }
 */
+BHTree::~BHTree(){
+    delete TNW;
+    delete BNW;
+    delete TNE;
+    delete BNE;
+    delete TSW;
+    delete BSW;
+    delete TSE;
+    delete BSE;
+}

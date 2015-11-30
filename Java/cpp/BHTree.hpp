@@ -11,6 +11,7 @@ public:
     BHTree(Oct* o);
     void insert(Body* b);
     void updateForce(Body* b);
+    ~BHTree();
 private:
 
     const double Theta = 0.5;
