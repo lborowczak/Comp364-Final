@@ -1,4 +1,5 @@
 #include "BHTree.hpp"
+#include <cmath>
 
 // Constructor: Creates new BHTree with no bodies
 BHTree::BHTree(Oct* o) {
@@ -166,14 +167,21 @@ void BHTree::updateForce(Body* b) {
         }
     }
 }
-/*
-public String toString() {
-    if (isExternal())
-        return " " + body + "\n";
-    else
-        return "*" + body + "\n" + TNW + BNW + TNE + BNE + TSW + BSW + TSE + BSE;
+void BHTree::search(Body* b[], int n){
+    double vmin = 1e10;
+    double vmax = 0;
+    double ave = 0;
+
+    for (int i = 0; i < n; i++){
+        double vmag = b[i]->vx * b[i]->vx + b[i]->vy * b[i]->vy + b[i]->vz * b[i]->vz;
+        vmag = sqrt(vmag);
+        vmax = max(vmax, vmag);
+        vmin = min(vmin, vmag);
+        ave += vmag;
+    }
+    ave = ave / n;
+    printf("Min/Max/Ave Velocity = %e, %e, %e\n", minv, maxv, ave);
 }
-*/
 BHTree::~BHTree(){
     delete TNW;
     delete BNW;
