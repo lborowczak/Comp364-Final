@@ -73,14 +73,12 @@ bool Body::in(Oct* o) {
 // center of mass calculation
 //TODO check if this is the correct formula
 void Body::plus(Body* b) {
+    Body* a = this;
 
-    mass = mass + b->mass;
-    rx = (rx * mass + b->rx * b->mass) / mass;
-    ry = (ry * mass + b->ry * b->mass) / mass;
-    rz = (rz * mass + b->rz * b->mass) / mass;
-    vy = b->vx;
-
-    //return Body(x, y, z, vx, b->vx, vy, m);
+    mass = a->mass + b->mass;
+    rx = (a->rx * a->mass + b->rx * b->mass) / mass;
+    ry = (a->ry * a->mass + b->ry * b->mass) / mass;
+    rz = (a->rz * a->mass + b->rz * b->mass) / mass;
 }
 
 void Body::copyFrom (Body* b){
