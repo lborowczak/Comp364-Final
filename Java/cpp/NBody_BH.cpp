@@ -60,7 +60,8 @@ using namespace std;
         auto t2 = chrono::system_clock::now();
         chrono::duration<double> t_elapsed = t2 - t1;
 
-        std::chrono::duration<double> avg_time = t_elapsed/num_steps;
-        printf("Average time = %f (ms) per step with %d elements over %d steps\n", avg_time*1000, nparts, num_steps);
-        //cout << "Average time = " << avg_time << " (ms) per step with " << nparts << " elements over " << num_steps << " steps." << endl;
+        chrono::duration<double> avg_time = t_elapsed/num_steps;
+        //printf("Average time = %f (ms) per step with %d elements over %d steps\n", avg_time*1000, nparts, num_steps);
+        cout << "Average time = " << fixed << avg_time.count() << " (s) per step with " << nparts << " elements over " << num_steps << " steps." << endl;
+        cout << "Total time (s): " <<fixed << t_elapsed.count() << endl;
     }

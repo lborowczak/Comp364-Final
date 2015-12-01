@@ -1,5 +1,6 @@
 #include "BHTree.hpp"
-#include <cmath>
+//#include <cmath>
+#include <algorithm> 
 
 // Constructor: Creates new BHTree with no bodies
 BHTree::BHTree(Oct* o) {
@@ -174,13 +175,13 @@ void BHTree::search(Body* b[], int n){
 
     for (int i = 0; i < n; i++){
         double vmag = b[i]->vx * b[i]->vx + b[i]->vy * b[i]->vy + b[i]->vz * b[i]->vz;
-        vmag = sqrt(vmag);
-        vmax = max(vmax, vmag);
-        vmin = min(vmin, vmag);
+        vmag = std::sqrt(vmag);
+        vmax = std::max(vmax, vmag);
+        vmin = std::min(vmin, vmag);
         ave += vmag;
     }
     ave = ave / n;
-    printf("Min/Max/Ave Velocity = %e, %e, %e\n", minv, maxv, ave);
+    printf("Min/Max/Ave Velocity = %e, %e, %e\n", vmin, vmax, ave);
 }
 BHTree::~BHTree(){
     delete TNW;
