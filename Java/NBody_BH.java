@@ -3,9 +3,9 @@ import java.util.Random;
 public class NBody_BH{
     public static void main(String [] args){
         Random rand = new Random();
-        final double dt = 0.1; //default time step, 0.1 seconds
-        int nparts = 10000; // default particle count, 100 particles
-        int num_steps = 1000; // default simulation steps, 100 steps
+        final double dt = 0.01; //default time step, 0.1 seconds
+        int nparts = 1000; // default particle count, 100 particles
+        int num_steps = 100; // default simulation steps, 100 steps
         double side = 1000.0;
 
         Body [] bodies = new Body[nparts];
@@ -13,16 +13,16 @@ public class NBody_BH{
             double x = rand.nextDouble() * side;
             double y = rand.nextDouble() * side;
             double z = rand.nextDouble() * side;
-            double vx = rand.nextDouble() * 10.0;
-            double vy = rand.nextDouble() * 10.0;
-            double vz = rand.nextDouble() * 10.0;
-            double mass = rand.nextDouble() * 1000000.0;
+            double vx = 0;
+            double vy = 0;
+            double vz = 0;
+            double mass = rand.nextDouble() * 1e20;
             bodies[i] = new Body(x, y, z, vx, vy, vz, mass);
         }
 
         double t1 = System.currentTimeMillis();
 
-        for (double t = 0.0; t < num_steps*dt; t += dt){
+        for (int step = 0; step < num_steps; step++){
             Oct oct = new Oct(0, 0, 0, side); // 1000x1000x1000 region of space
             BHTree bh = new BHTree(oct); // New empty BH Tree
 
@@ -39,7 +39,12 @@ public class NBody_BH{
                bh.updateForce(bodies[i]);
                bodies[i].update(dt);
             }
+            // search sometimes
+            if (step % 10 == 0){
+               bh.search(bodies, nparts);
+            }
         }
+
         double t2 = System.currentTimeMillis();
         double t_elapsed = t2 - t1;
 
