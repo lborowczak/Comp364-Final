@@ -10,7 +10,7 @@ using namespace std;
         srand(time(NULL)); //seed RNG
         const double dt = 0.1; //default time step, 0.1 seconds
         int nparts = 10000; // default particle count, 100 particles
-        int num_steps = 1000; // default simulation steps, 100 steps
+        int num_steps = 100; // default simulation steps, 100 steps
         double side = 1000.0;
 
         uniform_real_distribution<double> randDouble(0, 1);
@@ -24,7 +24,7 @@ using namespace std;
             double vx = 0;
             double vy = 0;
             double vz = 0;
-            double mass = randDouble(re) * 1e20;
+            double mass = randDouble(re) * 1e18;
             bodies[i] = new Body(x, y, z, vx, vy, vz, mass);
         }
 
@@ -60,6 +60,7 @@ using namespace std;
         auto t2 = chrono::system_clock::now();
         chrono::duration<double> t_elapsed = t2 - t1;
 
-        //double avg_time = t_elapsed/num_steps;
+        std::chrono::duration<double> avg_time = t_elapsed/num_steps;
+        printf("Average time = %f (ms) per step with %d elements over %d steps\n", avg_time*1000, nparts, num_steps);
         //cout << "Average time = " << avg_time << " (ms) per step with " << nparts << " elements over " << num_steps << " steps." << endl;
     }
