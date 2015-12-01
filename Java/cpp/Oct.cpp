@@ -66,11 +66,10 @@ Oct* Oct::TNE() {
 }
 
 
-//TODO why is this identical to TNE?
 Oct* Oct::BNE() {
     double x = xmid + length / 4.0;
     double y = ymid + length / 4.0;
-    double z = zmid + length / 4.0;
+    double z = zmid - length / 4.0;
     double len = length / 2.0;
     Oct* BNE = new Oct(x, y, z, len);
     return BNE;
