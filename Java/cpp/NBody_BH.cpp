@@ -21,16 +21,16 @@ using namespace std;
             double x = randDouble(re) * side;
             double y = randDouble(re) * side;
             double z = randDouble(re) * side;
-            double vx = randDouble(re) * 10.0;
-            double vy = randDouble(re) * 10.0;
-            double vz = randDouble(re) * 10.0;
-            double mass = randDouble(re) * 1000000.0;
+            double vx = 0;
+            double vy = 0;
+            double vz = 0;
+            double mass = randDouble(re) * 1e20;
             bodies[i] = new Body(x, y, z, vx, vy, vz, mass);
         }
 
         auto t1 = chrono::system_clock::now();
 
-        for (double t = 0.0; t < num_steps*dt; t += dt){
+        for (int step; step < num_steps; step++){
             Oct* oct = new Oct(0, 0, 0, side); // 1000x1000x1000 region of space
             BHTree* bh = new BHTree(oct); // New empty BH Tree
 
@@ -47,6 +47,10 @@ using namespace std;
                bh->updateForce(bodies[i]);
                bodies[i]->update(dt);
             }
+            // search sometimes
+            if (step % 10 == 0){
+               bh->search(bodies, nparts);
+            }
         delete oct;
         delete bh;
         }
@@ -56,6 +60,6 @@ using namespace std;
         auto t2 = chrono::system_clock::now();
         chrono::duration<double> t_elapsed = t2 - t1;
 
-        //avg_time = t_elapsed/num_steps;
+        //double avg_time = t_elapsed/num_steps;
         //cout << "Average time = " << avg_time << " (ms) per step with " << nparts << " elements over " << num_steps << " steps." << endl;
     }
