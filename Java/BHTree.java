@@ -139,6 +139,21 @@ public class BHTree {
             }
         }
     }
+    public void search(Body [] b, int n){
+        double vmin = 1e10;
+        double vmax = 0;
+        double ave = 0;
+
+        for (int i = 0; i < n; i++){
+            double vmag = b[i].vx * b[i].vx + b[i].vy * b[i].vy + b[i].vz * b[i].vz;
+            vmag = Math.sqrt(vmag);
+            vmax = Math.max(vmax, vmag);
+            vmin = Math.min(vmin, vmag);
+            ave += vmag;
+        }
+        ave = ave / n;
+        System.out.println("Min/Max/Ave Velocity: " + vmin + ", " + vmax + ", " + ave);
+    }    
 
     public String toString() {
         if (isExternal())
