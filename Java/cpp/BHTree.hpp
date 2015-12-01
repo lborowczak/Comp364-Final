@@ -11,6 +11,7 @@ public:
     BHTree(Oct* o);
     void insert(Body* b);
     void updateForce(Body* b);
+    void search(Body* b[], int n);
     ~BHTree();
 private:
 
