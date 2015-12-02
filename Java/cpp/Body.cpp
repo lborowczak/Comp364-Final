@@ -51,20 +51,15 @@ void Body::resetForce() {
 
 // adds the forces together
 void Body::addForce(Body* b) {
-    double EPS = 3E4;      // softening parameter
     double dx = b->rx - rx;
     double dy = b->ry - ry;
     double dz = b->rz - rz;
-    double dist = sqrt(dx*dx + dy*dy + dz*dz);
-    double F = (G * mass * b->mass) / (dist*dist + EPS*EPS);
+    double dist = sqrt(dx*dx + dy*dy + dz*dz + 1E-10);
+    double F = (G * mass * b->mass) / (dist*dist);
     fx += F * dx / dist;
     fy += F * dy / dist;
     fz += F * dz / dist;
 }
-// Nice representation of a body
-//String toString() {
-//    return String.format("%10.3E %10.3E %10.3E %10.3E %10.3E %10.3E %10.3E", rx, ry, rz, vx, vy, vz, mass);
-//}
 // checks if it's in the octant
 bool Body::in(Oct* o) {
     return o->contains(rx, ry, rz);
