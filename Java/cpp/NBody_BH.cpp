@@ -6,12 +6,23 @@
 
 using namespace std;
 
-    int main (){
+        int main (int argc, char* argv[]){
         srand(time(NULL)); //seed RNG
-        const double dt = 0.1; //default time step, 0.1 seconds
-        int nparts = 10000; // default particle count, 100 particles
+        const double dt = 0.01; //default time step, 0.1 seconds
+        int nparts = 100; // default particle count, 100 particles
+        // define number of particles
+        if (argc > 1){
+           if (isdigit(*argv[1])){
+              nparts = atoi( argv[1]);
+           }
+        }
         int num_steps = 100; // default simulation steps, 100 steps
-        double side = 1000.0;
+        if (argc > 2){
+           if (isdigit(*argv[2])){
+              num_steps = atoi(argv[2]);
+           }
+        }
+        double side = 2.0;
 
         uniform_real_distribution<double> randDouble(0, 1);
         default_random_engine re;
@@ -24,7 +35,7 @@ using namespace std;
             double vx = 0;
             double vy = 0;
             double vz = 0;
-            double mass = randDouble(re) * 1e18;
+            double mass = randDouble(re) + std::numeric_limits<double>::epsilon();
             bodies[i] = new Body(x, y, z, vx, vy, vz, mass);
         }
 
