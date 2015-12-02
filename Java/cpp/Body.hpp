@@ -6,7 +6,7 @@
 class Body
 {
 public:
-    const double G = 6.67e-11;
+    const double G = 1;
     double rx, ry, rz;       // position
     double vx, vy, vz;       // velocity
     double fx, fy, fz;       // force
