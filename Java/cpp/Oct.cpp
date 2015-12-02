@@ -112,22 +112,6 @@ Oct* Oct::BSE() {
     return BSE;
 }
 
-/*
-public String toString() {
-    String ret = "\n";
-    for (int row = 0; row < length; row++) {
-        for (int col = 0; col < length; col++) {
-            if (row == 0 || col == 0 || row == length - 1 || col == length - 1)
-                ret += "*";
-            else
-                ret += " ";
-        }
-        ret += "\n";
-    }
-    return ret;
-}
-*/
-
 void Oct::copyFrom(Oct* o){
     this->xmid = o->xmid;
     this->ymid = o->ymid;
