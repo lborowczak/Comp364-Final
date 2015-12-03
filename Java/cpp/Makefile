@@ -1,5 +1,6 @@
 CC = g++
 CFLAGS  = -g -Wall -std=c++11
+C_OPTIM_FLAGS = -std=c++11 -O3 -march=native -mtune=native
 
 default: Barnes-Hut
 
