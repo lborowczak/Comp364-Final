@@ -40,7 +40,8 @@ void Body::update(double dt) {
 double Body::distanceTo(Body* b) {
     double dx = rx - b->rx;
     double dy = ry - b->ry;
-    return sqrt(dx*dx + dy*dy);
+    double dz = rz - b->rz;
+    return sqrt(dx*dx + dy*dy + dz*dz);
 }
 
 void Body::resetForce() {
