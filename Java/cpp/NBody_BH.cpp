@@ -8,7 +8,7 @@ using namespace std;
 
         int main (int argc, char* argv[]){
         srand(time(NULL)); //seed RNG
-        const double dt = 0.01; //default time step, 0.1 seconds
+        const double dt = 0.0001; //default time step, 0.1 seconds
         int nparts = 100; // default particle count, 100 particles
         // define number of particles
         if (argc > 1){
@@ -41,7 +41,7 @@ using namespace std;
 
         auto t1 = chrono::system_clock::now();
 
-        for (int step; step < num_steps; step++){
+        for (int step = 0; step < num_steps; step++){
             Oct* oct = new Oct(0, 0, 0, side); // 1000x1000x1000 region of space
             BHTree* bh = new BHTree(oct); // New empty BH Tree
 
@@ -52,10 +52,14 @@ using namespace std;
                 }
             }
 
-            // update forces and positions
+            // update forces
             for (int i = 0; i < nparts; i++){
                bodies[i]->resetForce();
                bh->updateForce(bodies[i]);
+            }
+
+            // update positions and velocities
+            for (int i = 0; i < nparts; i++){
                bodies[i]->update(dt);
             }
             // search sometimes
@@ -71,8 +75,8 @@ using namespace std;
         auto t2 = chrono::system_clock::now();
         chrono::duration<double> t_elapsed = t2 - t1;
 
-        chrono::duration<double> avg_time = t_elapsed/num_steps;
+        chrono::duration<double> avg_time = 1000*t_elapsed/num_steps;
         //printf("Average time = %f (ms) per step with %d elements over %d steps\n", avg_time*1000, nparts, num_steps);
-        cout << "Average time = " << fixed << avg_time.count() << " (s) per step with " << nparts << " elements over " << num_steps << " steps." << endl;
-        cout << "Total time (s): " <<fixed << t_elapsed.count() << endl;
+        cout << "Average time = " << fixed << avg_time.count() << " (ms) per step with " << nparts << " elements over " << num_steps << " steps." << endl;
+        cout << "Total time (ms): " <<fixed << t_elapsed.count()*1000 << endl;
     }
