@@ -29,9 +29,9 @@ using namespace std;
 
         Body* bodies[nparts];// = new Body[nparts];
         for (int i = 0; i < nparts; i++){
-            double x = randDouble(re) * side;
-            double y = randDouble(re) * side;
-            double z = randDouble(re) * side;
+            double x = side * (randDouble(re) - 0.5);
+            double y = side * (randDouble(re) - 0.5);
+            double z = side * (randDouble(re) - 0.5);
             double vx = 0;
             double vy = 0;
             double vz = 0;

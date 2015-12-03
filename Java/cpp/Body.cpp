@@ -71,7 +71,7 @@ bool Body::in(Oct* o) {
 void Body::plus(Body* b) {
     Body* a = this;
 
-    totalMass = a->mass + b->mass;
+    double totalMass = a->mass + b->mass;
     a->rx = (a->rx * a->mass + b->rx * b->mass) / totalMass; //[(location * mass) + (location * mass)] / totalMass
     a->ry = (a->ry * a->mass + b->ry * b->mass) / totalMass;
     a->rz = (a->rz * a->mass + b->rz * b->mass) / totalMass;
@@ -88,4 +88,3 @@ void Body::copyFrom (Body* b){
     vz = b->vz;
     mass = b->mass;
 }
-
