@@ -71,10 +71,12 @@ bool Body::in(Oct* o) {
 void Body::plus(Body* b) {
     Body* a = this;
 
-    mass = a->mass + b->mass;
-    rx = (a->rx * a->mass + b->rx * b->mass) / mass;
-    ry = (a->ry * a->mass + b->ry * b->mass) / mass;
-    rz = (a->rz * a->mass + b->rz * b->mass) / mass;
+    totalMass = a->mass + b->mass;
+    a->rx = (a->rx * a->mass + b->rx * b->mass) / totalMass; //[(location * mass) + (location * mass)] / totalMass
+    a->ry = (a->ry * a->mass + b->ry * b->mass) / totalMass;
+    a->rz = (a->rz * a->mass + b->rz * b->mass) / totalMass;
+    a->mass = totalMass;
+    //works: ((((((2*7)+(3*5))/12) * 12) + (4*19))/31) == ((2*7)+(3*5)+(4*19))/31
 }
 
 void Body::copyFrom (Body* b){
