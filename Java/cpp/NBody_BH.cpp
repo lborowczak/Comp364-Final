@@ -47,6 +47,7 @@ using namespace std;
             BHTree* bh = new BHTree(oct); // New empty BH Tree
 
             // Build BH tree
+            
             for (int i = 0; i < nparts; i++){
                 if (bodies[i]->in(oct)){
                     bh->insert(bodies[i]);
@@ -54,6 +55,7 @@ using namespace std;
             }
 
             // update forces
+            #pragma omp parallel for
             for (int i = 0; i < nparts; i++){
                bodies[i]->resetForce();
                bh->updateForce(bodies[i]);

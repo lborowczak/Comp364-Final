@@ -1,6 +1,6 @@
 #include "BHTree.hpp"
 //#include <cmath>
-#include <algorithm> 
+#include <algorithm>
 
 // Constructor: Creates new BHTree with no bodies
 BHTree::BHTree(Oct* o) {
@@ -172,7 +172,7 @@ void BHTree::search(Body* b[], int n){
     double vmin = 1e10;
     double vmax = 0;
     double ave = 0;
-
+    #pragma omp parallel for reduction (+: ave) reduction (max: vmax) reduction (min: vmin)
     for (int i = 0; i < n; i++){
         double vmag = b[i]->vx * b[i]->vx + b[i]->vy * b[i]->vy + b[i]->vz * b[i]->vz;
         vmag = std::sqrt(vmag);
