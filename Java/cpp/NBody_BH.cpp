@@ -8,7 +8,7 @@ using namespace std;
 
         int main (int argc, char* argv[]){
         srand(time(NULL)); //seed RNG
-        const double dt = 0.0001; //default time step, 0.1 seconds
+        const double dt = 0.001; //default time step, 0.1 seconds
         int nparts = 100; // default particle count, 100 particles
         // define number of particles
         if (argc > 1){
@@ -43,6 +43,7 @@ using namespace std;
 
         for (int step = 0; step < num_steps; step++){
             Oct* oct = new Oct(0, 0, 0, side); // 1000x1000x1000 region of space
+            //printf("Side length: %e  \n", side);
             BHTree* bh = new BHTree(oct); // New empty BH Tree
 
             // Build BH tree
@@ -58,9 +59,13 @@ using namespace std;
                bh->updateForce(bodies[i]);
             }
 
-            // update positions and velocities
+            // update positions and velocities and side length
+            #pragma omp parallel for reduction (max: side)
             for (int i = 0; i < nparts; i++){
                bodies[i]->update(dt);
+               side = std::max(side, 2*std::abs(bodies[i]->rx));
+               side = std::max(side, 2*std::abs(bodies[i]->ry));
+               side = std::max(side, 2*std::abs(bodies[i]->rz));
             }
             // search sometimes
             if (step % 10 == 0){
