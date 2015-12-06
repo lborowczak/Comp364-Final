@@ -50,8 +50,6 @@ using namespace std;
             // Build BH tree
             #pragma omp parallel for
             for (int i = 0; i < nparts; i++){
-               #pragma omp critical
-               bh->lock();
                bh->insert(bodies[i]);
             }
 

@@ -14,75 +14,67 @@ BHTree::BHTree(Oct* o) {
     BSW = nullptr;
     TSE = nullptr;
     BSE = nullptr;
-    omp_init_lock(&treeLocked);
+    isExternal = true;
 }
 
 
 // Adds body to BH Tree
 void BHTree::insert(Body* b) {
 
+    bool wasInserted;
     // if this node does not contain a body, put the new body b here
-    if (insertIfFree(b)){
-        #pragma omp critical
-        unlock();
+    #pragma omp critical
+    wasInserted = insertIfFree(b);
+
+    if (wasInserted)
+    {
         return;
     }
 
     // internal node
-    if (! isExternal()) {
+    bool wasExternal = false;
+    #pragma omp critical
+    {
+        if (isExternal) {
+            isExternal = false;
+            wasExternal = true;
+
+            // subdivide the region further by creating eight children
+            Oct* tmpTNW = oct.TNW();
+            Oct* tmpBNW = oct.BNW();
+            Oct* tmpTNE = oct.TNE();
+            Oct* tmpBNE = oct.BNE();
+            Oct* tmpTSE = oct.TSE();
+            Oct* tmpBSE = oct.BSE();
+            Oct* tmpTSW = oct.TSW();
+            Oct* tmpBSW = oct.BSW();
+            TNW = new BHTree(tmpTNW);
+            BNW = new BHTree(tmpBNW);
+            TNE = new BHTree(tmpTNE);
+            BNE = new BHTree(tmpBNE);
+            TSE = new BHTree(tmpTSE);
+            BSE = new BHTree(tmpBSE);
+            TSW = new BHTree(tmpTSW);
+            BSW = new BHTree(tmpBSW);
+            delete tmpTNW;
+            delete tmpBNW;
+            delete tmpTNE;
+            delete tmpBNE;
+            delete tmpTSE;
+            delete tmpBSE;
+            delete tmpTSW;
+            delete tmpBSW;
+        }
         // update the center-of-mass and total mass
         body.plus(b);
-
-        //Body is now updated, no need to keep the tree locked
-        #pragma omp critical
-        unlock();
-
-        // recursively insert Body b into the appropriate octant
-        putBody(b);
     }
 
-    // external node
-    else {
-
-        // update the center-of-mass and total mass
-        body.plus(b);
-
-        //unlock this tree because we are not going to be adding anything to it
-        #pragma omp critical
-        unlock();
-
-        // subdivide the region further by creating eight children
-        Oct* tmpTNW = oct.TNW();
-        Oct* tmpBNW = oct.BNW();
-        Oct* tmpTNE = oct.TNE();
-        Oct* tmpBNE = oct.BNE();
-        Oct* tmpTSE = oct.TSE();
-        Oct* tmpBSE = oct.BSE();
-        Oct* tmpTSW = oct.TSW();
-        Oct* tmpBSW = oct.BSW();
-        TNW = new BHTree(tmpTNW);
-        BNW = new BHTree(tmpBNW);
-        TNE = new BHTree(tmpTNE);
-        BNE = new BHTree(tmpBNE);
-        TSE = new BHTree(tmpTSE);
-        BSE = new BHTree(tmpBSE);
-        TSW = new BHTree(tmpTSW);
-        BSW = new BHTree(tmpBSW);
-        delete tmpTNW;
-        delete tmpBNW;
-        delete tmpTNE;
-        delete tmpBNE;
-        delete tmpTSE;
-        delete tmpBSE;
-        delete tmpTSW;
-        delete tmpBSW;
-
-        // recursively insert both this body and Body b into the appropriate octant
+    if (wasExternal) {
+        // recursively insert this body into the appropriate octant
         putBody(&body);
-        putBody(b);
-
-
     }
+    // recursively insert Body b into the appropriate octant
+    putBody(b);
 }
 
 // Inserts a body into the appropriate octant.
@@ -99,66 +91,42 @@ void BHTree::putBody(Body* b) {
 
     if (b->in(tmpTNW))
     {
-        #pragma omp critical
-        TNW->lock();
         TNW->insert(b);
-        //TNW->unlock();
     }
 
     else if (b->in(tmpBNW))
     {
-        #pragma omp critical
-        BNW->lock();
         BNW->insert(b);
-        //BNW->unlock();
     }
 
     else if (b->in(tmpTNE))
     {
-        #pragma omp critical
-        TNE->lock();
         TNE->insert(b);
-        //TNE->unlock();
     }
 
     else if (b->in(tmpBNE))
     {
-        #pragma omp critical
-        BNE->lock();
         BNE->insert(b);
-        //BNE->unlock();
     }
 
     else if (b->in(tmpTSE))
     {
-        #pragma omp critical
-        TSE->lock();
         TSE->insert(b);
-        //TSE->unlock();
     }
 
     else if (b->in(tmpBSE))
     {
-        #pragma omp critical
-        BSE->lock();
         BSE->insert(b);
-        //BSE->unlock();
     }
 
     else if (b->in(tmpTSW))
     {
-        #pragma omp critical
-        TSW->lock();
         TSW->insert(b);
-        //TSW->unlock();
     }
 
     else if (b->in(tmpBSW))
     {
-        #pragma omp critical
-        BSW->lock();
         BSW->insert(b);
-        //BSW->unlock();
     }
 
     delete tmpTNW;
@@ -173,11 +141,12 @@ void BHTree::putBody(Body* b) {
 
 
 // returns true if the node is external
-bool BHTree::isExternal() {
+//bool BHTree::isExternal() {
     // a node is external iff all eight children are null
-    return (TNW == nullptr && BNW == nullptr && TNE == nullptr && BNE == nullptr &&
-            TSW == nullptr && BSW == nullptr && TSE == nullptr && BSE == nullptr);
-}
+    //return (TNW == nullptr && BNW == nullptr && TNE == nullptr && BNE == nullptr &&
+    //        TSW == nullptr && BSW == nullptr && TSE == nullptr && BSE == nullptr);
+    //return isExternal;
+//}
 
 
 /**
@@ -190,7 +159,7 @@ void BHTree::updateForce(Body* b) {
         return;
 
     // if the current node is external, update net force acting on b
-    if (isExternal())
+    if (isExternal)
         b->addForce(&body);
 
     // for internal nodes
@@ -247,13 +216,6 @@ bool BHTree::insertIfFree(Body *b){
 
 }
 
-void BHTree::lock(){
-    omp_set_lock(&treeLocked);
-    return;
-}
-void BHTree::unlock(){
-omp_unset_lock(&treeLocked);
-}
 
 BHTree::~BHTree(){
     delete TNW;
@@ -264,5 +226,4 @@ BHTree::~BHTree(){
     delete BSW;
     delete TSE;
     delete BSE;
-    omp_destroy_lock(&treeLocked);
 }

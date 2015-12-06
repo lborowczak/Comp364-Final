@@ -13,8 +13,6 @@ public:
     void insert(Body* b);
     void updateForce(Body* b);
     void search(Body* b[], int n);
-    void lock();
-    void unlock();
     ~BHTree();
 private:
 
@@ -32,9 +30,9 @@ private:
     BHTree* TSE;    // tree representing top southeast octant
     BHTree* BSE;    // tree representing bot southeast octant
     void putBody(Body* b);
-    bool isExternal();
+    //bool isExternal();
     bool insertIfFree(Body* b);
-    omp_lock_t treeLocked;
+    bool isExternal;
 };
 
 #endif
