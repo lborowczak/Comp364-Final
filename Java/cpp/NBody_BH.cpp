@@ -1,8 +1,8 @@
 #include <iostream>
 #include <chrono> //time
 #include <random> //random
+#include <omp.h> //openMP
 #include "NBody_BH.hpp"
-
 
 using namespace std;
 
@@ -48,7 +48,10 @@ using namespace std;
             BHTree* bh = new BHTree(oct); // New empty BH Tree
 
             // Build BH tree
+            #pragma omp parallel for
             for (int i = 0; i < nparts; i++){
+               #pragma omp critical
+               bh->lock();
                bh->insert(bodies[i]);
             }
 
@@ -68,12 +71,14 @@ using namespace std;
                side = std::max(side, 2*std::abs(bodies[i]->rz));
             }
             // search sometimes
+            //TODO why?
             if (step % 10 == 0){
                bh->search(bodies, nparts);
             }
         delete oct;
         delete bh;
         }
+
         #pragma omp parallel for
         for (int i = 0; i < nparts; i++){
             delete bodies[i];

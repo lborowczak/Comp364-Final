@@ -3,6 +3,7 @@
 
 #include "Oct.hpp"
 #include "Body.hpp"
+#include <omp.h>
 
 class BHTree
 {
@@ -12,6 +13,8 @@ public:
     void insert(Body* b);
     void updateForce(Body* b);
     void search(Body* b[], int n);
+    void lock();
+    void unlock();
     ~BHTree();
 private:
 
@@ -30,6 +33,8 @@ private:
     BHTree* BSE;    // tree representing bot southeast octant
     void putBody(Body* b);
     bool isExternal();
+    bool insertIfFree(Body* b);
+    omp_lock_t treeLocked;
 };
 
 #endif

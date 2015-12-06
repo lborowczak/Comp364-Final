@@ -14,6 +14,7 @@ BHTree::BHTree(Oct* o) {
     BSW = nullptr;
     TSE = nullptr;
     BSE = nullptr;
+    omp_init_lock(&treeLocked);
 }
 
 
@@ -21,9 +22,9 @@ BHTree::BHTree(Oct* o) {
 void BHTree::insert(Body* b) {
 
     // if this node does not contain a body, put the new body b here
-    if (noBody) {
-        body.copyFrom(b);
-        noBody = false;
+    if (insertIfFree(b)){
+        #pragma omp critical
+        unlock();
         return;
     }
 
@@ -32,13 +33,25 @@ void BHTree::insert(Body* b) {
         // update the center-of-mass and total mass
         body.plus(b);
 
+        //Body is now updated, no need to keep the tree locked
+        #pragma omp critical
+        unlock();
+
         // recursively insert Body b into the appropriate octant
         putBody(b);
     }
 
     // external node
     else {
-        // subdivide the region further by creating four children
+
+        // update the center-of-mass and total mass
+        body.plus(b);
+
+        //unlock this tree because we are not going to be adding anything to it
+        #pragma omp critical
+        unlock();
+
+        // subdivide the region further by creating eight children
         Oct* tmpTNW = oct.TNW();
         Oct* tmpBNW = oct.BNW();
         Oct* tmpTNE = oct.TNE();
@@ -64,13 +77,11 @@ void BHTree::insert(Body* b) {
         delete tmpTSW;
         delete tmpBSW;
 
-
         // recursively insert both this body and Body b into the appropriate octant
         putBody(&body);
         putBody(b);
 
-        // update the center-of-mass and total mass
-        body.plus(b);
+
     }
 }
 
@@ -87,28 +98,68 @@ void BHTree::putBody(Body* b) {
     Oct* tmpBSW = oct.BSW();
 
     if (b->in(tmpTNW))
+    {
+        #pragma omp critical
+        TNW->lock();
         TNW->insert(b);
+        //TNW->unlock();
+    }
 
     else if (b->in(tmpBNW))
+    {
+        #pragma omp critical
+        BNW->lock();
         BNW->insert(b);
+        //BNW->unlock();
+    }
 
     else if (b->in(tmpTNE))
+    {
+        #pragma omp critical
+        TNE->lock();
         TNE->insert(b);
+        //TNE->unlock();
+    }
 
     else if (b->in(tmpBNE))
+    {
+        #pragma omp critical
+        BNE->lock();
         BNE->insert(b);
+        //BNE->unlock();
+    }
 
     else if (b->in(tmpTSE))
+    {
+        #pragma omp critical
+        TSE->lock();
         TSE->insert(b);
+        //TSE->unlock();
+    }
 
     else if (b->in(tmpBSE))
+    {
+        #pragma omp critical
+        BSE->lock();
         BSE->insert(b);
+        //BSE->unlock();
+    }
 
     else if (b->in(tmpTSW))
+    {
+        #pragma omp critical
+        TSW->lock();
         TSW->insert(b);
+        //TSW->unlock();
+    }
 
     else if (b->in(tmpBSW))
+    {
+        #pragma omp critical
+        BSW->lock();
         BSW->insert(b);
+        //BSW->unlock();
+    }
 
     delete tmpTNW;
     delete tmpBNW;
@@ -183,6 +234,27 @@ void BHTree::search(Body* b[], int n){
     ave = ave / n;
     printf("Min/Max/Ave Velocity = %e, %e, %e\n", vmin, vmax, ave);
 }
+
+bool BHTree::insertIfFree(Body *b){
+    if (noBody) {
+        body.copyFrom(b);
+        noBody = false;
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}
+
+void BHTree::lock(){
+    omp_set_lock(&treeLocked);
+    return;
+}
+void BHTree::unlock(){
+omp_unset_lock(&treeLocked);
+}
+
 BHTree::~BHTree(){
     delete TNW;
     delete BNW;
@@ -192,4 +264,5 @@ BHTree::~BHTree(){
     delete BSW;
     delete TSE;
     delete BSE;
+    omp_destroy_lock(&treeLocked);
 }
