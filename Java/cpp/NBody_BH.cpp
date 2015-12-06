@@ -28,6 +28,7 @@ using namespace std;
         default_random_engine re;
 
         Body* bodies[nparts];// = new Body[nparts];
+
         for (int i = 0; i < nparts; i++){
             double x = side * (randDouble(re) - 0.5);
             double y = side * (randDouble(re) - 0.5);
@@ -47,11 +48,8 @@ using namespace std;
             BHTree* bh = new BHTree(oct); // New empty BH Tree
 
             // Build BH tree
-            
             for (int i = 0; i < nparts; i++){
-                if (bodies[i]->in(oct)){
-                    bh->insert(bodies[i]);
-                }
+               bh->insert(bodies[i]);
             }
 
             // update forces
@@ -76,6 +74,7 @@ using namespace std;
         delete oct;
         delete bh;
         }
+        #pragma omp parallel for
         for (int i = 0; i < nparts; i++){
             delete bodies[i];
         }
