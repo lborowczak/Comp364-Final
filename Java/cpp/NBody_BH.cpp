@@ -53,7 +53,7 @@ using namespace std;
             }
 
             // update forces
-            #pragma omp parallel for
+            #pragma omp parallel for schedule(dynamic, 12)
             for (int i = 0; i < nparts; i++){
                bodies[i]->resetForce();
                bh->updateForce(bodies[i]);
