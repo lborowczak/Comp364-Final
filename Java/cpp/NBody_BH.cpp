@@ -48,10 +48,15 @@ using namespace std;
             BHTree* bh = new BHTree(oct); // New empty BH Tree
 
             // Build BH tree
+            auto tbuild1 = chrono::system_clock::now();
             #pragma omp parallel for
             for (int i = 0; i < nparts; i++){
                bh->insert(bodies[i]);
             }
+            auto tbuild2 = chrono::system_clock::now();
+            chrono::duration<double> t_build_elapsed = tbuild2 - tbuild1;
+            cout << "Tree Build Time (ms): " <<fixed << t_build_elapsed.count()*1000 << endl;
+
 
             // update forces
             #pragma omp parallel for
