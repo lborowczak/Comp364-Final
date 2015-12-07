@@ -3,7 +3,6 @@
 
 #include "Oct.hpp"
 #include "Body.hpp"
-#include <omp.h>
 
 class BHTree
 {
@@ -30,9 +29,7 @@ private:
     BHTree* TSE;    // tree representing top southeast octant
     BHTree* BSE;    // tree representing bot southeast octant
     void putBody(Body* b);
-    //bool isExternal();
-    bool insertIfFree(Body* b);
-    bool isExternal;
+    bool isExternal();
 };
 
 #endif
