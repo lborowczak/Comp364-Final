@@ -1,0 +1,8 @@
+Memory leaks can cause severe performance problems
+-C++ has no garbage collector
+-Fixing them can make the program much faster even if you think you are doing more memory operations
+
+
+Small changes that you think are better can decrease performance (Eliminated an else and replaced a check with a boolean, but still had worse performance, compiler?)
+
+Java to C++ is not hard
