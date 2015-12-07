@@ -21,55 +21,43 @@ BHTree::BHTree(Oct* o) {
 // Adds body to BH Tree
 void BHTree::insert(Body* b) {
 
-    bool wasInserted;
     // if this node does not contain a body, put the new body b here
-    #pragma omp critical
-    wasInserted = insertIfFree(b);
-
-    if (wasInserted)
+    if (insertIfFree(b))
     {
         return;
     }
 
     // internal node
-    bool wasExternal = false;
-    #pragma omp critical
-    {
-        if (isExternal) {
-            isExternal = false;
-            wasExternal = true;
+    // update the center-of-mass and total mass
+    body.plus(b);
+    if (isExternal) {
+        isExternal = false;
 
-            // subdivide the region further by creating eight children
-            Oct* tmpTNW = oct.TNW();
-            Oct* tmpBNW = oct.BNW();
-            Oct* tmpTNE = oct.TNE();
-            Oct* tmpBNE = oct.BNE();
-            Oct* tmpTSE = oct.TSE();
-            Oct* tmpBSE = oct.BSE();
-            Oct* tmpTSW = oct.TSW();
-            Oct* tmpBSW = oct.BSW();
-            TNW = new BHTree(tmpTNW);
-            BNW = new BHTree(tmpBNW);
-            TNE = new BHTree(tmpTNE);
-            BNE = new BHTree(tmpBNE);
-            TSE = new BHTree(tmpTSE);
-            BSE = new BHTree(tmpBSE);
-            TSW = new BHTree(tmpTSW);
-            BSW = new BHTree(tmpBSW);
-            delete tmpTNW;
-            delete tmpBNW;
-            delete tmpTNE;
-            delete tmpBNE;
-            delete tmpTSE;
-            delete tmpBSE;
-            delete tmpTSW;
-            delete tmpBSW;
-        }
-        // update the center-of-mass and total mass
-        body.plus(b);
-    }
-
-    if (wasExternal) {
+        // subdivide the region further by creating eight children
+        Oct* tmpTNW = oct.TNW();
+        Oct* tmpBNW = oct.BNW();
+        Oct* tmpTNE = oct.TNE();
+        Oct* tmpBNE = oct.BNE();
+        Oct* tmpTSE = oct.TSE();
+        Oct* tmpBSE = oct.BSE();
+        Oct* tmpTSW = oct.TSW();
+        Oct* tmpBSW = oct.BSW();
+        TNW = new BHTree(tmpTNW);
+        BNW = new BHTree(tmpBNW);
+        TNE = new BHTree(tmpTNE);
+        BNE = new BHTree(tmpBNE);
+        TSE = new BHTree(tmpTSE);
+        BSE = new BHTree(tmpBSE);
+        TSW = new BHTree(tmpTSW);
+        BSW = new BHTree(tmpBSW);
+        delete tmpTNW;
+        delete tmpBNW;
+        delete tmpTNE;
+        delete tmpBNE;
+        delete tmpTSE;
+        delete tmpBSE;
+        delete tmpTSW;
+        delete tmpBSW;
         // recursively insert this body into the appropriate octant
         putBody(&body);
     }

@@ -49,7 +49,7 @@ using namespace std;
 
             // Build BH tree
             auto tbuild1 = chrono::system_clock::now();
-            #pragma omp parallel for
+            //#pragma omp parallel for
             for (int i = 0; i < nparts; i++){
                bh->insert(bodies[i]);
             }
