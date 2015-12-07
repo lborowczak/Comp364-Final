@@ -1,8 +1,8 @@
 #include <iostream>
 #include <chrono> //time
 #include <random> //random
-#include <omp.h> //openMP
 #include "NBody_BH.hpp"
+
 
 using namespace std;
 
@@ -48,15 +48,9 @@ using namespace std;
             BHTree* bh = new BHTree(oct); // New empty BH Tree
 
             // Build BH tree
-            auto tbuild1 = chrono::system_clock::now();
-            //#pragma omp parallel for
             for (int i = 0; i < nparts; i++){
                bh->insert(bodies[i]);
             }
-            auto tbuild2 = chrono::system_clock::now();
-            chrono::duration<double> t_build_elapsed = tbuild2 - tbuild1;
-            cout << "Tree Build Time (ms): " <<fixed << t_build_elapsed.count()*1000 << endl;
-
 
             // update forces
             #pragma omp parallel for
@@ -74,14 +68,12 @@ using namespace std;
                side = std::max(side, 2*std::abs(bodies[i]->rz));
             }
             // search sometimes
-            //TODO why?
             if (step % 10 == 0){
                bh->search(bodies, nparts);
             }
         delete oct;
         delete bh;
         }
-
         #pragma omp parallel for
         for (int i = 0; i < nparts; i++){
             delete bodies[i];

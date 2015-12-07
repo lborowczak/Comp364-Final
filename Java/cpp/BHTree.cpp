@@ -14,7 +14,6 @@ BHTree::BHTree(Oct* o) {
     BSW = nullptr;
     TSE = nullptr;
     BSE = nullptr;
-    isExternal = true;
 }
 
 
@@ -22,18 +21,24 @@ BHTree::BHTree(Oct* o) {
 void BHTree::insert(Body* b) {
 
     // if this node does not contain a body, put the new body b here
-    if (insertIfFree(b))
-    {
+    if (noBody) {
+        body.copyFrom(b);
+        noBody = false;
         return;
     }
 
     // internal node
-    // update the center-of-mass and total mass
-    body.plus(b);
-    if (isExternal) {
-        isExternal = false;
+    if (! isExternal()) {
+        // update the center-of-mass and total mass
+        body.plus(b);
 
-        // subdivide the region further by creating eight children
+        // recursively insert Body b into the appropriate octant
+        putBody(b);
+    }
+
+    // external node
+    else {
+        // subdivide the region further by creating four children
         Oct* tmpTNW = oct.TNW();
         Oct* tmpBNW = oct.BNW();
         Oct* tmpTNE = oct.TNE();
@@ -58,11 +63,15 @@ void BHTree::insert(Body* b) {
         delete tmpBSE;
         delete tmpTSW;
         delete tmpBSW;
-        // recursively insert this body into the appropriate octant
+
+
+        // recursively insert both this body and Body b into the appropriate octant
         putBody(&body);
+        putBody(b);
+
+        // update the center-of-mass and total mass
+        body.plus(b);
     }
-    // recursively insert Body b into the appropriate octant
-    putBody(b);
 }
 
 // Inserts a body into the appropriate octant.
@@ -78,44 +87,28 @@ void BHTree::putBody(Body* b) {
     Oct* tmpBSW = oct.BSW();
 
     if (b->in(tmpTNW))
-    {
         TNW->insert(b);
-    }
 
     else if (b->in(tmpBNW))
-    {
         BNW->insert(b);
-    }
 
     else if (b->in(tmpTNE))
-    {
         TNE->insert(b);
-    }
 
     else if (b->in(tmpBNE))
-    {
         BNE->insert(b);
-    }
 
     else if (b->in(tmpTSE))
-    {
         TSE->insert(b);
-    }
 
     else if (b->in(tmpBSE))
-    {
         BSE->insert(b);
-    }
 
     else if (b->in(tmpTSW))
-    {
         TSW->insert(b);
-    }
 
     else if (b->in(tmpBSW))
-    {
         BSW->insert(b);
-    }
 
     delete tmpTNW;
     delete tmpBNW;
@@ -129,12 +122,11 @@ void BHTree::putBody(Body* b) {
 
 
 // returns true if the node is external
-//bool BHTree::isExternal() {
+bool BHTree::isExternal() {
     // a node is external iff all eight children are null
-    //return (TNW == nullptr && BNW == nullptr && TNE == nullptr && BNE == nullptr &&
-    //        TSW == nullptr && BSW == nullptr && TSE == nullptr && BSE == nullptr);
-    //return isExternal;
-//}
+    return (TNW == nullptr && BNW == nullptr && TNE == nullptr && BNE == nullptr &&
+            TSW == nullptr && BSW == nullptr && TSE == nullptr && BSE == nullptr);
+}
 
 
 /**
@@ -147,7 +139,7 @@ void BHTree::updateForce(Body* b) {
         return;
 
     // if the current node is external, update net force acting on b
-    if (isExternal)
+    if (isExternal())
         b->addForce(&body);
 
     // for internal nodes
@@ -191,20 +183,6 @@ void BHTree::search(Body* b[], int n){
     ave = ave / n;
     printf("Min/Max/Ave Velocity = %e, %e, %e\n", vmin, vmax, ave);
 }
-
-bool BHTree::insertIfFree(Body *b){
-    if (noBody) {
-        body.copyFrom(b);
-        noBody = false;
-        return true;
-    }
-    else {
-        return false;
-    }
-
-}
-
-
 BHTree::~BHTree(){
     delete TNW;
     delete BNW;
