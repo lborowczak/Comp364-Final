@@ -55,7 +55,7 @@ void Body::addForce(Body* b) {
     double dx = b->rx - rx;
     double dy = b->ry - ry;
     double dz = b->rz - rz;
-    double dist = sqrt(dx*dx + dy*dy + dz*dz + 1E-10);
+    double dist = sqrt(dx*dx + dy*dy + dz*dz + TINY);
     double F = (G * mass * b->mass) / (dist*dist);
     fx += F * dx / dist;
     fy += F * dy / dist;

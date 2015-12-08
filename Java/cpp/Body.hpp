@@ -2,6 +2,7 @@
 #define BODY_HPP_INCLUDED
 
 #include "Oct.hpp"
+#include <float.h>
 
 class Body
 {
@@ -11,6 +12,7 @@ public:
     double vx, vy, vz;       // velocity
     double fx, fy, fz;       // force
     double mass;             // mass
+    const double TINY = DBL_EPSILON;
 
     Body();
     Body(double rx, double ry, double rz, double vx, double vy, double vz, double mass);
